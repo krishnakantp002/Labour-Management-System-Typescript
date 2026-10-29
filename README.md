@@ -6,7 +6,7 @@ Workers are paid **daily wages based on quantity of work** (tons loaded/unloaded
 
 ## Tech Stack
 
-- **Frontend**: React, Tailwind CSS, shadcn/ui, React Query
+- **Frontend**: React, Tailwind CSS, React Query
 - **Backend**: Node.js, Express.js, TypeScript, Prisma
 - **Database**: PostgreSQL
 - **Auth**: JWT + Bcrypt
