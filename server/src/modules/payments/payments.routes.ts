@@ -12,46 +12,46 @@ router.use(authenticateToken);
 
 // ─── Payment Routes ─────────────────────────────────────────
 
-// GET /api/payments/pending — Pending payments summary (Admin)
+// GET /api/payments/pending — Pending payments summary (Admin, Manager)
 router.get(
   '/pending',
-  roleGuard('ADMIN'),
+  roleGuard('ADMIN', 'MANAGER'),
   paymentController.pending
 );
 
-// GET /api/payments/worker/:workerId — Worker payment history + balance (Admin, Employee for own)
+// GET /api/payments/worker/:workerId — Worker payment history + balance (Admin, Manager, Employee for own)
 router.get(
   '/worker/:workerId',
   roleGuard('ADMIN', 'MANAGER', 'EMPLOYEE'),
   paymentController.workerPayments
 );
 
-// POST /api/payments — Record payment (Admin only)
+// POST /api/payments — Record payment (Admin, Manager)
 router.post(
   '/',
-  roleGuard('ADMIN'),
+  roleGuard('ADMIN', 'MANAGER'),
   validate(createPaymentSchema),
   paymentController.create
 );
 
-// GET /api/payments — List all payments (Admin)
+// GET /api/payments — List all payments (Admin, Manager)
 router.get(
   '/',
-  roleGuard('ADMIN'),
+  roleGuard('ADMIN', 'MANAGER'),
   paymentController.getAll
 );
 
-// GET /api/payments/:id — Single payment (Admin)
+// GET /api/payments/:id — Single payment (Admin, Manager)
 router.get(
   '/:id',
-  roleGuard('ADMIN'),
+  roleGuard('ADMIN', 'MANAGER'),
   paymentController.getOne
 );
 
-// DELETE /api/payments/:id — Delete payment (Admin only)
+// DELETE /api/payments/:id — Delete payment (Admin, Manager)
 router.delete(
   '/:id',
-  roleGuard('ADMIN'),
+  roleGuard('ADMIN', 'MANAGER'),
   paymentController.remove
 );
 

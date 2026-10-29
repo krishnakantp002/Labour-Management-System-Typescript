@@ -16,14 +16,22 @@ interface WorkerSummary {
 }
 
 export default function Reports() {
+  const getLocalDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
     d.setDate(1); // First day of current month
-    return d.toISOString().split('T')[0];
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}-01`;
   });
-  const [endDate, setEndDate] = useState(() => {
-    return new Date().toISOString().split('T')[0]; // Today
-  });
+  const [endDate, setEndDate] = useState(() => getLocalDateString());
 
   const { data: reportData = [], isLoading, refetch, isFetching } = useQuery({
     queryKey: ['report-worker-summary', startDate, endDate],

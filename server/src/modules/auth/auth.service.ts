@@ -23,8 +23,8 @@ export async function registerUser(input: RegisterInput) {
   const hashedPassword = await bcrypt.hash(input.password, 10);
   const id = uuidv4();
   await query(
-    `INSERT INTO users (id, name, email, password_hash) VALUES (?, ?, ?, ?)`,
-    [id, input.name, input.email, hashedPassword]
+    `INSERT INTO users (id, name, email, password_hash, role) VALUES (?, ?, ?, ?, ?)`,
+    [id, input.name, input.email, hashedPassword, input.role]
   );
   
   const inserted = await query<UserRow>('SELECT * FROM users WHERE id = ?', [id]);
@@ -86,6 +86,28 @@ export async function changePassword(id: string, input: ChangePasswordInput) {
   await query('UPDATE users SET password_hash = ? WHERE id = ?', [hashedNewPassword, id]);
 
   return { success: true };
+}
+
+export async function listUsers() {
+  const result = await query<UserRow & { created_at: string }>(
+    `SELECT id, name, email, role, is_active, created_at
+     FROM users
+     ORDER BY created_at ASC`
+  );
+  return result.rows;
+}
+
+export async function setUserActiveStatus(id: string, isActive: boolean) {
+  const result = await query<UserRow>('SELECT * FROM users WHERE id = ?', [id]);
+  const user = result.rows[0];
+  if (!user) {
+    throw Object.assign(new Error('User not found'), { statusCode: 404 });
+  }
+
+  await query('UPDATE users SET is_active = ? WHERE id = ?', [isActive, id]);
+
+  const updated = await query<UserRow>('SELECT id, name, email, role, is_active FROM users WHERE id = ?', [id]);
+  return updated.rows[0];
 }
 
 export async function refreshAccessToken(refreshToken: string) {

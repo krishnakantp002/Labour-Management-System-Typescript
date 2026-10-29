@@ -163,8 +163,10 @@ export async function getWorkEntries(filters: WorkEntryQuery) {
 
   const dataResult = await query<WorkEntryRow>(
     `SELECT we.*,
-            w.name AS worker_name, w.worker_id AS worker_code,
+            w.name AS worker_name, w.worker_id AS worker_code, w.worker_id AS worker_human_id,
             p.name AS product_name,
+            we.rate_used AS rate_applied,
+            we.amount AS total_amount,
             u.name AS recorded_by_name
      FROM work_entries we
      JOIN workers w ON we.worker_id = w.id
@@ -187,8 +189,10 @@ export async function getWorkEntries(filters: WorkEntryQuery) {
 export async function getWorkEntryById(id: string) {
   const result = await query<WorkEntryRow>(
     `SELECT we.*,
-            w.name AS worker_name, w.worker_id AS worker_code,
+            w.name AS worker_name, w.worker_id AS worker_code, w.worker_id AS worker_human_id,
             p.name AS product_name,
+            we.rate_used AS rate_applied,
+            we.amount AS total_amount,
             u.name AS recorded_by_name
      FROM work_entries we
      JOIN workers w ON we.worker_id = w.id
@@ -220,9 +224,9 @@ export async function getDailySummary(date?: string) {
   );
 
   const breakdown = await query<WorkEntryRow>(
-    `SELECT w.name AS worker_name, w.worker_id AS worker_code,
+    `SELECT w.name AS worker_name, w.worker_id AS worker_code, w.worker_id AS worker_human_id,
             p.name AS product_name,
-            we.quantity_tons, we.rate_used, we.amount
+            we.quantity_tons, we.rate_used AS rate_applied, we.amount AS total_amount
      FROM work_entries we
      JOIN workers w ON we.worker_id = w.id
      JOIN products p ON we.product_id = p.id
@@ -270,7 +274,9 @@ export async function getWorkerEarnings(workerId: string, startDate?: string, en
   );
 
   const entries = await query<WorkEntryRow>(
-    `SELECT we.*, p.name AS product_name
+    `SELECT we.*, p.name AS product_name,
+            we.rate_used AS rate_applied,
+            we.amount AS total_amount
      FROM work_entries we
      JOIN products p ON we.product_id = p.id
      ${whereClause}

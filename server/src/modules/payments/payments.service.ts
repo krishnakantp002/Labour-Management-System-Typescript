@@ -234,7 +234,7 @@ export async function getPendingPayments() {
   };
 }
 
-// ─── Delete Payment (Admin only) ────────────────────────────
+// ─── Delete Payment ─────────────────────────────────────────
 
 export async function deletePayment(id: string) {
   const result = await query<PaymentRow>('SELECT * FROM payments WHERE id = ?', [id]);
@@ -243,11 +243,5 @@ export async function deletePayment(id: string) {
   }
 
   await query('DELETE FROM payments WHERE id = ?', [id]);
-  return result.rows[0];
-
-  if (result.rows.length === 0) {
-    throw Object.assign(new Error('Payment not found'), { statusCode: 404 });
-  }
-
   return result.rows[0];
 }

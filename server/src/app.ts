@@ -12,6 +12,8 @@ import workRoutes from './modules/work/work.routes';
 import paymentRoutes from './modules/payments/payments.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import reportRoutes from './modules/reports/reports.routes';
+import logRoutes from './modules/logs/logs.routes';
+import { auditMiddleware } from './modules/logs/audit.middleware';
 
 const app = express();
 
@@ -43,6 +45,9 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ─── API Routes ─────────────────────────────────────────────
+// Audit middleware — records every alteration for the admin log
+app.use('/api', auditMiddleware);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/workers', workerRoutes);
 // app.use('/api/users', userRoutes);           // Future
@@ -52,6 +57,7 @@ app.use('/api/work', workRoutes);
 app.use('/api/payments', paymentRoutes);     // Phase 9
 app.use('/api/dashboard', dashboardRoutes);  // Phase 10
 app.use('/api/reports', reportRoutes);       // Phase 11
+app.use('/api/logs', logRoutes);             // Audit trail (Admin only)
 
 // ─── 404 Handler ────────────────────────────────────────────
 app.use((_req, res) => {

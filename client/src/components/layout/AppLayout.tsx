@@ -1,7 +1,6 @@
-
 import { Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogOut, LayoutDashboard, Users, Clock, DollarSign, FileText, Truck, Tag } from 'lucide-react';
+import { LogOut, LayoutDashboard, Users, Clock, DollarSign, FileText, Truck, Tag, ShieldCheck, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function AppLayout() {
@@ -30,6 +29,10 @@ export default function AppLayout() {
     { name: 'Work Entry', icon: Truck, path: '/work' },
     { name: 'Payments', icon: DollarSign, path: '/payments' },
     { name: 'Reports', icon: FileText, path: '/reports' },
+    // User management is admin-only
+    ...(user?.role === 'ADMIN' ? [{ name: 'Users', icon: ShieldCheck, path: '/users' }] : []),
+    // Audit log is admin-only
+    ...(user?.role === 'ADMIN' ? [{ name: 'Audit Log', icon: History, path: '/logs' }] : []),
   ];
 
   return (
@@ -47,7 +50,9 @@ export default function AppLayout() {
         
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           {menu.map(item => {
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive =
+              location.pathname === item.path ||
+              location.pathname.startsWith(item.path + '/');
             return (
               <button 
                 key={item.name}

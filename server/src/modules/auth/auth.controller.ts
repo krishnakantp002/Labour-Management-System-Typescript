@@ -55,6 +55,43 @@ export async function changePassword(req: AuthRequest, res: Response): Promise<v
   }
 }
 
+// ─── GET /api/auth/users ────────────────────────────────────
+export async function listUsers(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const users = await authService.listUsers();
+    sendSuccess(res, users, 'Users fetched');
+  } catch (error: unknown) {
+    const err = error as Error & { statusCode?: number };
+    sendError(res, err.message, err.statusCode || 500);
+  }
+}
+
+// ─── PATCH /api/auth/users/:id/status ───────────────────────
+export async function toggleUserStatus(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+    const userId = String(id);
+
+    if (typeof isActive !== 'boolean') {
+      sendError(res, 'isActive must be a boolean', 400);
+      return;
+    }
+
+    // Prevent an admin from deactivating their own account
+    if (req.user && req.user.id === userId && !isActive) {
+      sendError(res, 'You cannot deactivate your own account', 400);
+      return;
+    }
+
+    const user = await authService.setUserActiveStatus(userId, isActive);
+    sendSuccess(res, user, isActive ? 'User activated' : 'User deactivated');
+  } catch (error: unknown) {
+    const err = error as Error & { statusCode?: number };
+    sendError(res, err.message, err.statusCode || 500);
+  }
+}
+
 // ─── POST /api/auth/refresh ─────────────────────────────────
 export async function refreshToken(req: AuthRequest, res: Response): Promise<void> {
   try {

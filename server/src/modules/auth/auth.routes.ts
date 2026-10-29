@@ -17,6 +17,24 @@ const router = Router();
 // POST /api/auth/login
 router.post('/login', validate(loginSchema), authController.login);
 
+// ─── Admin Only Routes ──────────────────────────────────────
+
+// GET /api/auth/users (Admin only — list all accounts)
+router.get(
+  '/users',
+  authenticateToken,
+  roleGuard('ADMIN'),
+  authController.listUsers
+);
+
+// PATCH /api/auth/users/:id/status (Admin only — activate/deactivate an account)
+router.patch(
+  '/users/:id/status',
+  authenticateToken,
+  roleGuard('ADMIN'),
+  authController.toggleUserStatus
+);
+
 // POST /api/auth/refresh
 router.post('/refresh', validate(refreshTokenSchema), authController.refreshToken);
 
